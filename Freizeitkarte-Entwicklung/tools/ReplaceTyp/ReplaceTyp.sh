@@ -27,16 +27,24 @@
 #
 #====================================================================
 
+# Update 2015-10-13:
+# - support for OS Darwin
+# - make sure the script runs also with legacy shell, not only bash
+
 # Try to get parameters to be able to work non-interactive
 imgfile=$1
 typfile=$2
 
 # Tool to change the type file including path
-gmt=./gmt
+if [ "`uname`" = "Darwin" ]; then
+    gmt=./gmt_darwin
+else
+    gmt=./gmt
+fi
 
 # Check if we have a first parameter. We need this all the time as we
 # need to know which image we should operate on
-if (( $# == 0 )); then
+if [ $# -eq 0 ]; then
 	echo "Please pass the imgfile you wish to change as argument:"
 	echo ""
 	echo "  $ ReplaceTyp.sh gmapsupp.img"
@@ -59,7 +67,7 @@ fi
 # Check if we got a second parameter, and if so, check if a file of
 # that name exists. Then we will not ask for a type file but just use
 # the one passed on.
-if (( $# == 2 )); then
+if [ $# -eq 2 ]; then
 	if [ -f $2 ]; then
 		echo Using passed type $typfile
 	else
@@ -77,19 +85,25 @@ if [ -z "$typfile" ]; then
 	typC="outdoor-light    - no symbols on the areas included     "
 	typD="contrast         - colors are 'stronger' in compare to 'freizeit'"
 	typE="small            - optimized for GPS devices with small displays"
-  typF="outdoor-contrast - similar to contrast, no symbols on areas"
+          typF="outdoor-contrast - similar to contrast, no symbols on areas"
 
 	echo "  A: $typA"
 	echo "  B: $typB"
 	echo "  C: $typC"
 	echo "  D: $typD"
 	echo "  E: $typE"
-  echo "  F: $typF"
+          echo "  F: $typF"
 	echo "  Q: Quit "
 	echo ""
 
 	echo "Enter your choice (A-E, Q): "
-	read -n 1 key
+          # Do we run bash ?
+          if [ -n "$BASH" ]; then
+                    read -n 1 key
+          else
+                    read key
+          fi
+
 	echo ""
 
 	typefile=''

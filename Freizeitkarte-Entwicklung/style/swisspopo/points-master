@@ -26,6 +26,9 @@
 # Version : 0.15 -05.05.2014: Adapting finalize section to support new mkgmap version 2096 and newer
 # Version : 0.16 -02.09.2014: Fixing problem with ammenity=parking & (access=yes | access=public)
 #           0.17 -14.09.2014: Fixing a new bug introduced regarding restricted parking
+# Version : 0.18 -02.05.2015: Changes regarding amenity = place_of_worship and buildings
+# Version : 0.19 -19.06.2015: Proper handling place_of_worship without names (to show name and symbol too)
+# Version : 0.20 -16.03.2016: Remapped Camping from 0x2B03 to 0x2B05 due to categorization problems with GPSMap 64s
 #
 # Copyright (C) 2011, 2012 Klaus Tockloth <freizeitkarte@googlemail.com>
 #
@@ -405,7 +408,8 @@ tourism = alpine_hut                      {name "$__ALPINEHUT__"}          [0x48
 tourism = aquarium & name = * {name "${name} ($__AQUARIUM__)"} [0x2c07 resolution 24]
 
 # Sehenswürdigkeit. [point, closedway]
-tourism = attraction & name = * {name "${name} ($__ATTRACTION__)"} [0x6600 resolution 24]
+# (Excluding worship places here, that tag should be stronger than attraction)
+tourism = attraction & name = * & amenity != place_of_worship {name "${name} ($__ATTRACTION__)"} [0x6600 resolution 24]
 
 # Kunstwerk, Kunstobjekt. [point, closedway]
 tourism = artwork & name = * {name "${name} ($__ARTWORK__)"} [0x6600 resolution 24]
@@ -427,10 +431,10 @@ amenity = shelter & shelter_type = basic_hut                      {name "$__BASI
 tourism = bed_and_breakfast & name = * { name "${name} ($__BEDANDBREAKFAST__)" } [0x2b02 resolution 24]
 
 # Campingplatz. [point, closedway]
-tourism = camp_site & name = * {name "${name} ($__CAMPSITE__)"} [0x2b03 resolution 24]
+tourism = camp_site & name = * {name "${name} ($__CAMPSITE__)"} [0x2b05 resolution 24]
 
 # Stellplatz für Wohnmobile (Reisemobile). [point, closedway]
-tourism = caravan_site & name = * {name "${name} ($__CARAVANSITE__)"} [0x2b03 resolution 24]
+tourism = caravan_site & name = * {name "${name} ($__CARAVANSITE__)"} [0x2b05 resolution 24]
 
 # Ferienwohnung, Ferienhaus, Sennhütte. [point, closedway]
 tourism = chalet & name = * { name "${name} ($__CHALET__)" } [0x2b02 resolution 24]
@@ -974,12 +978,16 @@ amenity = embassy & name = * {name "${name} ($__EMBASSY__)"} [0x3003 resolution 
 amenity = fire_station & name = * {name "${name} ($__FIRESTATION__)"} [0x3008 resolution 24]
 
 # Anbetungsort (Kirche, Moschee, Synagoge). [point, closedway]
-amenity = place_of_worship & religion = christian & name = * {name "${name} ($__CHRISTIAN__, $__PLACEOFWORSHIP__)"}   [0x2c0b resolution 24]
-amenity = place_of_worship & religion = muslim    & name = * {name "${name} ($__MUSLIM__, $__PLACEOFWORSHIP__)"}  [0x2c0d resolution 24]
-amenity = place_of_worship & religion = jewish    & name = * {name "${name} ($__JEWISH__, $__PLACEOFWORSHIP__)"} [0x2c0e resolution 24]
+amenity = place_of_worship & religion = christian & name = * {name "${name} ($__CHRISTIAN__, $__PLACEOFWORSHIP__)"} [0x2c0b resolution 24]
+amenity = place_of_worship & religion = christian            {name "$__CHRISTIAN__, $__PLACEOFWORSHIP__"}           [0x2c0b resolution 24]
+amenity = place_of_worship & religion = muslim    & name = * {name "${name} ($__MUSLIM__, $__PLACEOFWORSHIP__)"}    [0x2c0d resolution 24]
+amenity = place_of_worship & religion = muslim               {name "$__MUSLIM__, $__PLACEOFWORSHIP__"}              [0x2c0d resolution 24]
+amenity = place_of_worship & religion = jewish    & name = * {name "${name} ($__JEWISH__, $__PLACEOFWORSHIP__)"}    [0x2c0e resolution 24]
+amenity = place_of_worship & religion = jewish               {name "$__JEWISH__, $__PLACEOFWORSHIP__"}              [0x2c0e resolution 24]
 
 # Anbetungsort (allgemein). [point, closedway]
 amenity = place_of_worship & name = * {name "${name} ($__PLACEOFWORSHIP__)"} [0x6405 resolution 24]
+amenity = place_of_worship            {name "$__PLACEOFWORSHIP__"}           [0x6405 resolution 24]
 
 # Polizeistation. [point, closedway]
 amenity = police {name "${name} ($__POLICE__)" | "$__POLICE__"} [0x3001 resolution 24]
