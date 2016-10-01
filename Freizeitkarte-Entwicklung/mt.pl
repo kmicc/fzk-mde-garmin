@@ -3151,7 +3151,7 @@ sub create_image_directory {
   # Jump to the work directory
   chdir "$WORKDIRLANG";
 
-  my $destdir = "$INSTALLDIR/$mapname" . "_Images";
+  my $destdir = "$INSTALLDIR";
 
   # remove eventially existing imagedir directory in the install Dir
   rmtree ( $destdir, { verbose => 1, safe => 1, keep_root => 1 } );
