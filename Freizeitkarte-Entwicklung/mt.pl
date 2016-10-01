@@ -713,12 +713,8 @@ elsif ( $actionname eq 'bim' ) {
   join_mapdata             ();
   split_mapdata            ();
   create_cfgfile           ();
-  create_typtranslations   ();
-  compile_typfiles         ();
-  create_typfile           ();
-  create_styletranslations ();
-  preprocess_styles        ();
   build_map                ();
+  create_image_directory   ();
 }
 elsif ( $actionname eq 'bam' ) {
   create_typfile         ();
@@ -1231,7 +1227,7 @@ sub split_mapdata {
    . " --keep-complete=true" 
    . " --mapid=" 
    . $mapid . "0001" 
-   . " --max-nodes=800000" 
+   . " --max-nodes=400000"
    . " --output=xml" 
    . " --output-dir=$WORKDIR $filename_ergebnisdaten";
   process_command ( $command );
@@ -1350,7 +1346,7 @@ sub create_cfgfile {
       . "#   by default.  The overview-mapname can be used to change the name.\n" 
       . "#   If the mapset is sent to the device from MapSource, it will enable\n" 
       . "#   find by name and address search on the GPS.\n" 
-      . "index\n" );
+      . "#index\n" );
 
   printf { $fh }
     (   "\n"
@@ -1406,7 +1402,7 @@ sub create_cfgfile {
        . "#     Way 4 - name=Main Street [A504]\n"
        . "#    The node matches to way 1 and way 2 but not to way 3 (does not equal exactly)\n"
        . "#    and not to way 4 (only text in round brackets is ignored)\n"
-       . "housenumbers\n" );
+       . "#housenumbers\n" );
 
   printf { $fh } ( "\n# Overview map options:\n" );
   printf { $fh } ( "# ---------------------\n" );
@@ -1458,7 +1454,7 @@ sub create_cfgfile {
       . "#   (see resources/styles/default for an example).  The directory\n"
       . "#   path must be absolute or relative to the current working\n"
       . "#   directory when mkgmap is invoked.\n"
-      . "style-file=$WORKDIRLANG/$mapstyledir\n" );
+      . "#style-file=$WORKDIRLANG/$mapstyledir\n" );
 
   printf { $fh } ( "\n# Product description options:\n" );
   printf { $fh } ( "# ---------------------------\n" );
@@ -1527,7 +1523,7 @@ sub create_cfgfile {
       . "# --route\n"
       . "#   Experimental: Create maps that support routing. This implies --net\n"
       . "#   (so that --net need not be given if --route is given).\n"
-      . "route\n" );
+      . "#route\n" );
 
   printf { $fh }
     (   "\n"
@@ -2411,7 +2407,7 @@ sub build_map {
   copy ( "$BASEPATH/license.txt", "license.txt" ) or die ( "copy() failed: $!\n" );
 
   # run mkgmap to build the map from the OSM data (-Dlog.config=logging.properties) (with checking style files first with --check-styles)
-  $command = "java -Xmx" . $javaheapsize . "M" . " -jar $BASEPATH/tools/mkgmap/mkgmap.jar $max_jobs -c $mapname.cfg --check-styles";
+  $command = "java -Xmx" . $javaheapsize . "M" . " -jar $BASEPATH/tools/mkgmap/mkgmap.jar $max_jobs -c $mapname.cfg";
   process_command ( $command );
 
   # Check Return Value
@@ -3181,12 +3177,6 @@ sub create_image_directory {
     copy ( $file, $destdir . "/" . $file ) or die ( "copy() $file failed: $!\n" );
   }
 
-  # copy all TYP files
-  for my $file ( <*.TYP> ) {
-    printf { *STDOUT } ( "Copying %s\n", $file );
-    copy ( $file, $destdir . "/" . $file ) or die ( "copy() $file failed: $!\n" );
-  }
-  
   return;
 }
 
